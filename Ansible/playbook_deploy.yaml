@@ -1,0 +1,90 @@
+---
+- hosts: access_Public
+  gather_facts: True
+  become: yes
+  
+  vars:
+    dest_dir: /var/www/html
+    image_urls:
+      - https://acs-project-181543232.s3.us-east-1.amazonaws.com/images/ilovecats.jpg
+      - https://acs-project-181543232.s3.us-east-1.amazonaws.com/images/ilovedogs.jpg
+    source_template: ./index.html.j2
+
+  tasks:
+    - block: # RedHat Block
+      - name: Install Apache Web Server for RedHat
+        yum:
+          name: httpd
+          state: latest
+      
+      - name: Ensure destination directory exists
+        file:
+          path: "{{ dest_dir }}"
+          state: directory
+          mode: 0755
+
+      - name: Copy dynamic index.html
+        template:
+          src: "{{ source_template }}"
+          dest: "{{ dest_dir }}/index.html"
+          mode: 0644
+        notify: Restart Httpd
+
+      - name: Start Apache Web Server
+        service:
+          name: httpd
+          state: started
+          enabled: yes
+
+      when: ansible_os_family == "RedHat"
+      
+    - block: # Debian Block
+      - name: Install Apache Web Server for Debian
+        apt:
+          name: apache2
+          state: latest
+          update_cache: yes
+      
+      - name: Ensure destination directory exists
+        file:
+          path: "{{ dest_dir }}"
+          state: directory
+          mode: 0755
+
+      - name: Copy dynamic index.html
+        template:
+          src: "{{ source_template }}"
+          dest: "{{ dest_dir }}/index.html"
+          mode: 0644
+        notify: Restart Apache2
+
+      - name: Start Apache Web Server
+        service:
+          name: apache2
+          state: started
+          enabled: yes
+
+      when: ansible_os_family == "Debian"
+
+    - name: Run uptime command
+      shell: /usr/bin/uptime
+      register: result
+
+    - name: Print result variable
+      debug: 
+        var: result.stdout
+
+    - name: Print debug message
+      debug: 
+        msg: "The uptime command result: {{ result.stdout }}"
+
+  handlers:
+    - name: Restart Httpd
+      service:
+        name: httpd
+        state: restarted
+
+    - name: Restart Apache2
+      service:
+        name: apache2
+        state: restarted

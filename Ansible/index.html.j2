@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two-Tier Web Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 50px; /* Space at the bottom for footer */
+        }
+
+        header {
+            background-color: #4682b4;
+            color: white;
+            padding: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        img {
+            width: 20%;
+            height: auto;
+            border: 5px solid #4682b4;
+            margin: 20px auto;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            margin: 5px 0;
+        }
+
+        footer {
+            background-color: #4682b4; /* Matching header */
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px; /* Smaller font for footer text */
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: 20px; /* Space above the footer */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Two-Tier Web Application!</h1>
+        <h2>Powered by a Load Balancer and EC2 Instances</h2>
+    </header>
+
+    <main>
+        <p>This web application demonstrates high availability and load balancing across multiple EC2 instances.</p>
+        <p>If you see this page, the Load Balancer is successfully routing traffic to this instance!</p>
+
+        <!-- Image based on the Instance ID -->
+        <img id="instance-image" alt="Instance-Specific Image">
+
+        <h3>Instance Details</h3>
+        <p><strong>Instance ID:</strong> {{ instance_id }}</p>
+
+        <p><strong>Deployed by:</strong> ACS-Project-Team</p>
+        <h3>Team Members</h3>
+        <ul> 
+            <li>Member 1: Arpit Gupta</li>
+            <li>Member 2: Ankita Mahajan</li>
+            <li>Member 3: Rupesh Vanneldas</li>
+            <li>Member 4: Yashika Desul</li>
+            <li>Member 5: Hamza Siddiqui</li>
+        </ul>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 ACS Project Team - Two-Tier Web Application Project</p>
+    </footer>
+    
+    <script>
+        // Example instance ID (this would be dynamically passed from your backend)
+        var currentInstanceId = '{{ instance_id }}';  // Replace this with actual instance ID
+
+        // Define images for different instance IDs
+        var instanceImages = [
+            "https://acs-project-181543232.s3.us-east-1.amazonaws.com/images/ilovecats.jpg",
+            "https://acs-project-181543232.s3.us-east-1.amazonaws.com/images/ilovedogs.jpg"
+        ];
+
+        // Set the image based on the instance ID
+        function setImageForInstance(instanceId) {
+            var imageElement = document.getElementById("instance-image");
+            
+            if (!imageElement.src) {
+                imageElement.src = instanceImages[0];
+            }
+            else{
+            // If the instance ID has changed, update the image
+            if (imageElement.src === instanceImages[0]) {
+                imageElement.src = instanceImages[1];  // Change to second image if first is shown
+            } else {
+                imageElement.src = instanceImages[0];  // Otherwise, set to the first image
+            }
+            }
+        }
+
+        // Call the function to set the image when the page loads (or refreshes)
+        setImageForInstance(currentInstanceId);
+    </script>
+</body>
+</html>
